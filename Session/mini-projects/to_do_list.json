@@ -1,0 +1,17 @@
+{
+    "T1": {
+        "name": "Homework Tasks",
+        "status": "completed",
+        "percentage": 100
+    },
+    "T2": {
+        "name": "Coding homework",
+        "status": "in-progress",
+        "percentage": 50.0
+    },
+    "T3": {
+        "name": "Laundry",
+        "status": "completed",
+        "percentage": 100
+    }
+}
