@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status
-from schemas import ToDoList
+from schemas import ToDoList, ToDoListResponse
 import json
 
 app = FastAPI(
@@ -20,10 +20,10 @@ def add_new_task(task_info : ToDoList):
     save_tasks()
     return {"received_data" : tasks}
 
-@app.get('/get_task_by_id/')
-def get_task_by_id(task_id: str):
+@app.get('/get_task_by_id/', response_model=ToDoListResponse)
+def get_task_by_id(task_id: str) -> ToDoListResponse:
     if task_id in tasks.keys():
-        return {"status" : "successful", "result" : tasks[task_id]}
+        return ToDoListResponse(status="successful", message=tasks[task_id])
     raise Exception (
         status_code=status.HTTP_404_NOT_FOUND
     )
@@ -71,62 +71,62 @@ def get_task_by_percentage(task_percentage: str):
 def get_all():
     return tasks
 
-@app.put('/update_task/')
-def update_task(update_key : str, input_value : ToDoList):
+@app.put('/update_task/', response_model=ToDoListResponse)
+def update_task(update_key : str, input_value : ToDoList) -> ToDoListResponse:
     if update_key in tasks.keys():
         tasks.update({update_key : input_value})
         save_tasks()
-        return {"status":"ok", "message" : "Dictionary updated"}
+        return ToDoListResponse(status="successful", message="Dictionary updated")
     raise Exception (
         status_code=status.HTTP_404_NOT_FOUND
     )
 
-@app.put('/update_task_name/')
-def update_task_name(update_key : str, input_name : str):
+@app.put('/update_task_name/', response_model=ToDoListResponse)
+def update_task_name(update_key : str, input_name : str) -> ToDoListResponse:
     if update_key in tasks.keys():
         tasks[update_key]["name"] = input_name
         save_tasks()
-        return {"status":"ok", "message" : "Dictionary updated"}
+        return ToDoListResponse(status="successful", message="Dictionary updated")
     raise Exception (
         status_code=status.HTTP_404_NOT_FOUND
     )
 
-@app.put('/update_task_status/')
-def update_task_status(update_key : str, input_status : str):
+@app.put('/update_task_status/', response_model=ToDoListResponse)
+def update_task_status(update_key : str, input_status : str) -> ToDoListResponse:
     if update_key in tasks.keys():
         tasks[update_key]["status"] = input_status
         if input_status == "completed":
-            tasks[update_key]["percentage"] = 100
+            tasks[update_key]["percentage"] = 100.0
         save_tasks()
-        return {"status":"ok", "message" : "Dictionary updated"}
+        return ToDoListResponse(status="successful", message="Dictionary updated")
     raise Exception (
         status_code=status.HTTP_404_NOT_FOUND
     )
 
-@app.put('/update_task_percentage/')
-def update_task_percentage(update_key : str, input_percentage : float):
+@app.put('/update_task_percentage/', response_model=ToDoListResponse)
+def update_task_percentage(update_key : str, input_percentage : float) -> ToDoListResponse:
     if update_key in tasks.keys():
         tasks[update_key]["percentage"] = input_percentage
         if input_percentage == 100:
             tasks[update_key]["status"] = "completed"
         save_tasks()
-        return {"status":"ok", "message" : "Dictionary updated"}
+        return ToDoListResponse(status="successful", message="Dictionary updated")
     raise Exception (
         status_code=status.HTTP_404_NOT_FOUND
     )
 
-@app.delete('/delete_task/')
-def delete_task(delete_key : str):
+@app.delete('/delete_task/', response_model=ToDoListResponse)
+def delete_task(delete_key : str) -> ToDoListResponse:
     if delete_key in tasks.keys():
         tasks.pop(delete_key)
         save_tasks()
-        return {"status":"ok", "message" : "Item deleted"}
+        return ToDoListResponse(status="successful", message="Item deleted")
     raise Exception (
         status_code=status.HTTP_404_NOT_FOUND
     )
 
-@app.delete('/delete_completed/')
-def delete_complete():
+@app.delete('/delete_completed/', response_model=ToDoListResponse)
+def delete_complete() -> ToDoListResponse:
     deleted = False
     for task_id, task in tasks.items():
         if task["status"] == "completed":
@@ -134,9 +134,9 @@ def delete_complete():
             deleted = True
     if deleted:
         save_tasks()
-        return {"status":"ok", "message" : "Completed item(s) deleted"}
+        return ToDoListResponse(status="successful", message="Completed item(s) deleted")
     else:
-        return {"status":"ok", "message" : "No completed items"}
+        return ToDoListResponse(status="successful", message="No completed items")
 
 def save_tasks():
     with open(file_path, "w") as json_file:

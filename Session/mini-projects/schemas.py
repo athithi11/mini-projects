@@ -17,3 +17,7 @@ class ToDoList(BaseModel):
         if value < 0 or value > 100:
             raise ValueError("Percentage must be between 0 and 100")
         return value
+
+class ToDoListResponse(BaseModel):
+    status: str
+    message: str
